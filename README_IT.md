@@ -122,6 +122,22 @@ Visualizza la ALV sullo schermo. Deve essere chiamato dopo `build( )`.
 Aggiorna la visualizzazione ALV per riflettere le modifiche apportate alla tabella interna sottostante.
 Deve essere chiamato dopo `build( )`.
 
+| Parametro | Tipo | Default | Descrizione |
+|-----------|------|---------|-------------|
+| `iv_refresh_mode` | `salv_de_refresh` | `if_salv_c_refresh=>full` | Profondità del refresh. Valori: `none` (0), `soft` (1 — solo celle visibili), `full` (2 — ridisegno completo) |
+| `is_stable` | `lvc_s_stbl` | — (opzionale) | Impostare `row`/`col` = `abap_true` per preservare la posizione di scroll dopo il refresh |
+
+```abap
+" Full refresh, posizione di scroll preservata
+lo_salv->refresh(
+    is_stable = VALUE #( row = abap_true col = abap_true ) ).
+
+" Soft refresh (più veloce), posizione di scroll preservata
+lo_salv->refresh(
+    iv_refresh_mode = if_salv_c_refresh=>soft
+    is_stable       = VALUE #( row = abap_true col = abap_true ) ).
+```
+
 **Solleva:** `cx_sy_ref_is_initial` se `build( )` non è stato chiamato prima.
 
 ---
@@ -503,5 +519,6 @@ go_salv->set_all_functions( ).
 go_salv->display( ).
 
 " Dopo una modifica ai dati:
-go_salv->refresh( ).
+go_salv->refresh(
+    is_stable = VALUE #( row = abap_true col = abap_true ) ).
 ```

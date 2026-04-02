@@ -37,11 +37,16 @@ CLASS lcl_build_salv DEFINITION.
 
     " Refreshes the ALV display after data changes in the underlying internal table.
     " Must be called after build( ).
+    " iv_refresh_mode: if_salv_c_refresh=>full (default), soft, or none.
+    " is_stable: set row/col = abap_true to keep the current scroll position after refresh.
     refresh
+      IMPORTING
+        iv_refresh_mode TYPE salv_de_refresh OPTIONAL "Default: if_salv_c_refresh=>full. Values: none(0), soft(1), full(2)"
+        is_stable       TYPE lvc_s_stbl      OPTIONAL "row/col = abap_true to preserve scroll position after refresh"
       RAISING
         cx_sy_ref_is_initial,
 
-    "!!! can't use this method with a container. Only full-screen mode.
+    "can't use this method with a container. Only full-screen mode.
     " Sets the PF-STATUS and enabled toolbar functions for the ALV.
     " To create a custom PF-STATUS: SE41 -> copy program SAPLSALV_METADATA_STATUS, status SALV_TABLE_STANDARD.
     set_screen_status
@@ -221,7 +226,15 @@ CLASS lcl_build_salv IMPLEMENTATION.
       RAISE EXCEPTION TYPE cx_sy_ref_is_initial.
     ENDIF.
 
-    mo_alv->refresh( ).
+    " Default to full refresh if caller did not provide a mode.
+    " Note: none(0) is initial — treated as full, but calling refresh( none ) is pointless anyway.
+    DATA(lv_refresh_mode) = COND #(
+        WHEN iv_refresh_mode IS INITIAL THEN if_salv_c_refresh=>full
+        ELSE iv_refresh_mode ).
+
+    mo_alv->refresh(
+        s_stable     = is_stable
+        refresh_mode = lv_refresh_mode ).
   ENDMETHOD.
 
   METHOD build_in_container.
