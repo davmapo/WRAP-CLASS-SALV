@@ -26,6 +26,7 @@ while still allowing full access to the underlying SAP SALV objects for advanced
   - [set_optimize_columns](#set_optimize_columns)
   - [get_columns](#get_columns)
   - [get_events](#get_events)
+  - [set_column_editable](#set_column_editable)
   - [get_alv_table_components](#get_alv_table_components)
 - [Typical Call Order](#typical-call-order)
 - [Full Example Program](#full-example-program)
@@ -306,6 +307,28 @@ SET HANDLER lo_handler->on_link_click   FOR lo_salv->get_events( ).
 ```
 
 **Common events:** `double_click`, `link_click`, `before_salv_function`, `after_salv_function`, `added_function`, `top_of_page`
+
+---
+
+### `set_column_editable`
+
+Enables or disables cell editing for a single column via the extended grid API.
+Must be called after `build( )`.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `iv_columnname` | `lvc_fname` | — (required) | Field name of the column to configure |
+| `iv_enabled` | `abap_bool` | `abap_true` | `abap_true` = cells become input-ready, `abap_false` = read-only |
+
+```abap
+" Make a column editable
+lo_salv->set_column_editable( iv_columnname = 'VALUT' ).
+
+" Return it to read-only
+lo_salv->set_column_editable( iv_columnname = 'VALUT' iv_enabled = abap_false ).
+```
+
+**Raises:** `cx_sy_ref_is_initial` if `build( )` was not called first, `cx_salv_not_found` if the column does not exist.
 
 ---
 

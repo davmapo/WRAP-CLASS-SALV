@@ -26,6 +26,7 @@ mantenendo allo stesso tempo l'accesso completo agli oggetti SAP SALV sottostant
   - [set_optimize_columns](#set_optimize_columns)
   - [get_columns](#get_columns)
   - [get_events](#get_events)
+  - [set_column_editable](#set_column_editable)
   - [get_alv_table_components](#get_alv_table_components)
 - [Ordine di Chiamata Tipico](#ordine-di-chiamata-tipico)
 - [Programma di Esempio Completo](#programma-di-esempio-completo)
@@ -306,6 +307,28 @@ SET HANDLER lo_handler->on_link_click   FOR lo_salv->get_events( ).
 ```
 
 **Eventi comuni:** `double_click`, `link_click`, `before_salv_function`, `after_salv_function`, `added_function`, `top_of_page`
+
+---
+
+### `set_column_editable`
+
+Abilita o disabilita l'input su una singola colonna tramite l'extended grid API.
+Deve essere chiamato dopo `build( )`.
+
+| Parametro | Tipo | Default | Descrizione |
+|-----------|------|---------|-------------|
+| `iv_columnname` | `lvc_fname` | — (obbligatorio) | Nome del campo della colonna da configurare |
+| `iv_enabled` | `abap_bool` | `abap_true` | `abap_true` = celle diventano editabili, `abap_false` = sola lettura |
+
+```abap
+" Rende la colonna editabile
+lo_salv->set_column_editable( iv_columnname = 'VALUT' ).
+
+" La rimette in sola lettura
+lo_salv->set_column_editable( iv_columnname = 'VALUT' iv_enabled = abap_false ).
+```
+
+**Solleva:** `cx_sy_ref_is_initial` se `build( )` non è stato chiamato prima, `cx_salv_not_found` se la colonna non esiste.
 
 ---
 

@@ -159,6 +159,18 @@ CLASS lcl_build_salv DEFINITION.
       RAISING
         cx_sy_ref_is_initial,
 
+    " Enables or disables input editing for a single column via the extended grid API.
+    " iv_enabled = abap_true  → cells in the column become input-ready.
+    " iv_enabled = abap_false → column returns to read-only.
+    " Must be called after build( ).
+    set_column_editable
+      IMPORTING
+        iv_columnname TYPE lvc_fname         "Field name of the column to configure"
+        iv_enabled    TYPE abap_bool DEFAULT abap_true "abap_true = editable, abap_false = read-only"
+      RAISING
+        cx_sy_ref_is_initial
+        cx_salv_not_found,
+
     " Returns the list of fields (components) of the ALV internal table
     " using RTTI introspection. Useful for looping over columns dynamically.
     " Can be called at any time after the constructor — does not require build( ).
@@ -454,6 +466,19 @@ CLASS lcl_build_salv IMPLEMENTATION.
     lo_alv_t_descr ?= cl_abap_typedescr=>describe_by_data( <lt_table> ).
     lo_alv_s_descr ?= lo_alv_t_descr->get_table_line_type( ).
     et_alv = lo_alv_s_descr->components.
+  ENDMETHOD.
+
+  METHOD set_column_editable.
+    " Guard: mo_alv must be initialized via build( ) before calling this method.
+    IF mo_alv IS INITIAL.
+      RAISE EXCEPTION TYPE cx_sy_ref_is_initial.
+    ENDIF.
+
+    " Navigate the extended grid API chain and configure editability for the column.
+    " Raises cx_salv_not_found if iv_columnname does not exist in the ALV columns.
+    mo_alv->extended_grid_api( )->editable_restricted( )->set_attributes_for_columnname(
+        columnname              = iv_columnname
+        all_cells_input_enabled = iv_enabled ).
   ENDMETHOD.
 
 ENDCLASS.
