@@ -41,7 +41,7 @@ CLASS lcl_build_salv DEFINITION.
     " is_stable: set row/col = abap_true to keep the current scroll position after refresh.
     refresh
       IMPORTING
-        iv_refresh_mode TYPE salv_de_refresh OPTIONAL "Default: if_salv_c_refresh=>full. Values: none(0), soft(1), full(2)"
+        iv_refresh_mode TYPE i               OPTIONAL "Default: if_salv_c_refresh=>full. Values: none(0), soft(1), full(2)"
         is_stable       TYPE lvc_s_stbl      OPTIONAL "row/col = abap_true to preserve scroll position after refresh"
       RAISING
         cx_sy_ref_is_initial,
